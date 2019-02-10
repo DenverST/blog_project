@@ -5,6 +5,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 def home(request):
   context = {
     'posts': Post.objects.all()
@@ -12,7 +15,7 @@ def home(request):
   return render(request, 'blog/home.html', context)
 
 def about(request):
-  return render(request, 'blog/about.html', {'title':'About'})
+  return render(request, 'blog/about.html', {'title':'About', "array":["Gender", "Income"]})
 
 class PostListView(ListView):
   model = Post
@@ -67,6 +70,16 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
       return True
     return False
 
+class Chart(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, format=None):
+        context = {
+          "Gender":{"header": "Gender", "values": [12,10,3], "index": ["Male", "Female", "Undefined"]},
+          "Income":{"header": "Income", "values": [8,10,7], "index": ["0-$50", "$50-100", "$100+"]},
+        }
+        return Response(context)
 
 
 
